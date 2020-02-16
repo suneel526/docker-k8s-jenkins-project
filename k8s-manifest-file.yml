@@ -1,0 +1,46 @@
+# rc file for mahalogin application using tomcat
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: app-tomcat-rc
+spec:
+  replicas: 2
+  selector:
+    app: mahalogin
+  template:
+    metadata:
+      name: mahalogin
+      labels:
+        app: mahalogin
+    spec:
+      containers:
+        - name: tomcat-pod
+          image: suneel0526/k8s-docker-jenkins
+          ports:
+          - app: mahalogin
+            containerPort: 8080
+
+---
+# k8s service file for above RC file
+
+apiVersion: v1
+kind: Service
+metadata:
+    name: app-tomcat-svc
+    lables:
+        app: mahalogin
+spec:
+    type: NodePort
+    ports: 
+    - port: 8080
+      nodePort: 30005
+      protocol: TCP
+    selector:
+      app: mahalogin
+          
+    
+
+
+
+
+
