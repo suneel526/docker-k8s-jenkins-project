@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: tomcat2-pod
-        image: suneel0526/k8s-docker-jenkins
+        image: suneel0526/k8s-docker-jenkins:1
         ports:
         - containerPort: 8080
 
