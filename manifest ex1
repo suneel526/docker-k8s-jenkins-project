@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: tomcat2-rc
+spec:
+  replicas: 2
+  selector:
+    app: tomcat2
+    version: 2.7.02
+  template:
+    metadata:
+      labels:
+        app: tomcat2
+        version: 2.7.02
+    spec:
+      containers:
+      - name: tomcat2-pod
+        image: suneel0526/k8s-docker-jenkins
+        ports:
+        - containerPort: 8080
+
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat2-svc
+  labels:
+    app: tomcat2
+    version: 2.7.02
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    nodePort: 30001
+    protocol: TCP
+  selector:
+    app: tomcat2
+    version: 2.7.02
+
