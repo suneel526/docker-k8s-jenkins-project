@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: tomcat2-pod
-        image: suneel0526/k8s-docker-jenkins:1
+        image: suneel0526/k8s-docker-jenkins:2
         ports:
         - containerPort: 8080
 
@@ -32,8 +32,7 @@ spec:
   type: NodePort
   ports:
   - port: 8080
-    nodePort: 30001
-    protocol: TCP
+    nodePort: 30007
   selector:
     app: tomcat2
     version: 2.7.02
