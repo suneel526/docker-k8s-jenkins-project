@@ -1,12 +1,141 @@
-launch a t2.micro instance 
-install java
-install maven
-install jenkins
-install docker
+launch a t2.micro instance as jenkins master
 
-Before starting this process we have to add jenkins to docker group for that we have to use the following command
-->
+1)install java
+2)install maven
+3)install jenkins
+4)install docker
+
+-> we have to add jenkins to docker group for that we have to use the following command
+
 // 
  sudo usermod -aG docker jenkins
 //
 
+now connect the jenkins server by using public ip:8080
+ex: 172.168.88.1:8080
+
+-> copy the path and paste it in the jenkins server terminal by adding-> cat path
+-> login to jenkins admin
+-> go to manage jenkins and search in avaliblity -> deploy Kubernetes Continuous Deploy Plugin
+-> now come to jenkins main page and click-> new item and select a pipeline project and create a pipeline project
+
+now we have the following tasks to perform
+1) Cloning the source code from git-hub repository 
+2) Install maven goles
+3) write a Docker file and build an image 
+4) Now push the Docker image file to docker hub (hub.docker.com).
+5) Now create a k8s cluster using one master and one slave and we have to create the manifest file (manifest.yml) on k8s cluster 
+   and there by we can deploy the application over tomcat web server.
+
+lets discuss in detail
+1) After creating a pipeline project we have to configure it got to pipeline and start writing the stages.
+-> In the first stage we have to write the following code so it will clone the code from git-hub 
+ 
+	ex: node{
+			
+		stage('git-clone'){
+						
+				 git 'https://github.com/suneel526/docker-k8s-jenkins-project.git'				
+
+			}			
+
+		}
+2) In the second stage we have to generate the war file by using maven for that we have to use the shell script
+
+ex: node{
+	
+		stage('mvn install'){
+        
+        sh label: '', script: 'mvn install'
+        
+    }
+	
+}
+
+3) In the third stage we have to write a Docker-file and build an image out of it for docker file refer my github repository 
+
+		-> suneel526/docker-k8s-jenkins-project
+
+ ex: node{
+
+		stage('docker image build'){
+        
+              sh label: '', script: 'docker build -t suneel0526/k8s-docker-jenkins:1 .'
+        
+    }
+
+}
+
+4) In the fourth stage we have to push the image to the docker hub account by using credentials as secret text for that we have take help from 
+	->pipeline syntax
+		
+	-> search for with-Credentials
+	give the related information on the syntax generater for more help refer my videos
+
+ ex: node{
+
+		stage('docker image push into docker hub'){
+     
+     withCredentials([string(credentialsId: 'docker-id', variable: 'password')]) {
+    // some block
+    
+        sh "docker login -u suneel0526 -p ${password}"
+
+}   
+    sh "docker push suneel0526/k8s-docker-jenkins" 
+    }	
+	
+}
+
+5) In this fifth stage we have to create a manifest.yml on the k8s cluster.
+  Before that we have to add a credentials in the jenkins credentials 
+	
+we have to follow the following steps
+		->cd .kube/
+		->.kube# cat config
+		-> cat .kube/config
+
+copy the entire file content and paste it in credentials you can find it in detail in the video file for this project
+
+-> Now click on the pipeline syntax 
+-> Type kube and you can select the kubernetes deploy option 
+-> You can fill the details and click generate you will find the syntax copy it and paste it in the final stage ie., fifth stage 
+
+eg: node{
+
+		  stage('K8s-deploy'){
+        
+        kubernetesDeploy( 
+        configs: 'k8s-manifest-file.yml',
+        kubeconfigId: 'k8s',
+        enableConfigSubstitution: true
+        
+        )
+        
+    }
+
+} 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+This is a rough documentation for this project you can go through the video for in depth explination
+
+In the last step we can do in the second process
+
+we can directly copy the .kube/config file into jenkins user in the terminal and we can directly create the pods by using the following command
+
+
+eg:  node{
+
+	stage('k8s-deploy'){
+
+		sh label: '', script: 'kubectl create -f manifest.yml'
+}
+
+} 
+
+
+This will make lot easier if we follow this approach.
+
+
+------------------------------------------------ox-Thankyou-xo------------------------------------------------------------------------
