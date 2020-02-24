@@ -1,10 +1,3 @@
-Before starting this process we have to add jenkins to docker group for that we have to use the following command
-->
-// 
- sudo usermod -aG docker jenkins
-//
-
-
 node{
     
     stage('git-clone'){
@@ -45,4 +38,6 @@ node{
         
         )
     }
-}
+
+    
+    }
