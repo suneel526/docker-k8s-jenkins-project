@@ -11,6 +11,11 @@ launch a t2.micro instance as jenkins master
  sudo usermod -aG docker jenkins
 //
 
+//
+*)to initate kube cluster
+-> kubeadm init
+//
+
 now connect the jenkins server by using public ip:8080
 ex: 172.168.88.1:8080
 
@@ -120,10 +125,44 @@ eg: node{
 
 This is a rough documentation for this project you can go through the video for in depth explination
 
-In the last step we can do in the second process
+In the last step we can do in the second process by following below steps and commands:
+1)We can directly copy the .kube/config file of k8s master into jenkins user in the terminal for that
 
-we can directly copy the .kube/config file into jenkins user in the terminal and we can directly create the pods by using the following command
+step1: log on to jenkins master and log in to jenkins user by following commands:
+ 	
+	su jenkins
+        cd
+->create a directory .kube like
+   mkdir .kube
+   vi .kube/config
 
+step2: Now log on to k8s master and copy the .kube/config file content by using the following command
+	
+	cat .kube/config
+
+	copy the entire content from api to =
+	
+step3: Now come to jenkins mastert terminal in jenkins user vi .kube/config and paste the entire content in that file then save and 
+exit.
+
+step4: We have to install kubectl on jenkins master to run the script (or) kubectl commands
+
+sudo apt-get update && sudo apt-get install -y apt-transport-https
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubectl
+
+now we can check kubectl command is working or not by using following commands on jenkins master itself
+
+	ex: kubectl get nodes
+	    kubectl get pods
+	    kubectl get rc
+	    kubectl get svc
+	    kubectl delete rc/rc file name 	
+	    kubectl delete svc/svc file name
+
+now execute the following stage(or) script to run the manifest-file.yml directly 
 
 eg:  node{
 
